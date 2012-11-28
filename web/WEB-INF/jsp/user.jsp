@@ -25,7 +25,7 @@
 					| <a href="stream">Tweet Stream</a> | <a href="user">All Users</a> | <a href="user?id=${loggedUser.id}">My Profile</a> | <a href="login?logout">Logout</a> | 
 				</c:if>
 				<c:if test="${loggedUser eq null}">
-				| <a href="login">Login / Register</a> | <a href="user">All Users</a> |  
+					| <a href="login">Login / Register</a> | <a href="user">All Users</a> |  
 				</c:if>
 			</div>
 		</div>
@@ -54,7 +54,7 @@
 							<div class="tweet-text">${tweet.text}</div>
 						</div>
 						<div class="cleaner"></div>
-						<span class="tweet-bottom"><a class="tweet-date" href="#"><fmt:formatDate value="${tweet.published}" pattern="dd.MM.yyyy HH:mm" /></a> | ${tweet.retweetCount}x Retweeted | <a class="tweet-date" href="#">Retweet now</a></span>
+						<span class="tweet-bottom"><a class="tweet-date" href="#"><fmt:formatDate value="${tweet.published}" pattern="dd.MM.yyyy HH:mm" /></a> | ${tweet.retweetCount}x Retweeted | <a class="tweet-date" href="stream?retweet=${tweet.tweetId}">Retweet now</a></span>
 					</div>
 
 				</c:forEach>
@@ -63,18 +63,26 @@
 
 				<div class="pager">
 					<div class="pager">
-					<c:forEach items="${tweetsPager}" var="item">
-						<c:if test="${item.active}"><span><a href="user?id=${user.id}&page=${item.number}">${item.text}</a></span></c:if>
-						<c:if test="${!item.active}"><span class="pager-curent">${item.text}</a></span></c:if>
-					</c:forEach>
-				</div>
+						<c:forEach items="${tweetsPager}" var="item">
+							<c:if test="${item.active}"><span><a href="user?id=${user.id}&page=${item.number}">${item.text}</a></span></c:if>
+							<c:if test="${!item.active}"><span class="pager-curent">${item.text}</a></span></c:if>
+						</c:forEach>
+					</div>
 				</div>
 			</div>
 			<div class="right-menu">
 
 				<div class="profile-info-upper">
 					<div class="user-image"><img src="user-images/${user.image}" alt="picture"></div>
-					<div class="user-name">${user.name} ${user.surname}<br><a class="profile-link" href="user?id=${user.id}">@${user.login}</a></div>
+					<div class="user-name">
+						${user.name} ${user.surname}<br><a class="profile-link" href="user?id=${user.id}">@${user.login}</a>
+						<c:if test="${loggedUser ne null and friends}">
+							<a href="user?unfollow=${user.id}">Unfollow</a>
+						</c:if>
+						<c:if test="${loggedUser ne null and !friends and loggedUser.id ne user.id}">
+							<a href="user?follow=${user.id}">Follow</a>
+						</c:if>
+					</div>
 					<div class="cleaner"></div>
 				</div>
 				<div class="profile-info-lower">
@@ -93,7 +101,7 @@
 						</div>
 
 					</c:forEach>
-					
+
 					<h3>${fn:length(followings)} Followings</h3>
 
 					<c:forEach items="${followings}" var="following">

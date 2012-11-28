@@ -36,29 +36,50 @@ public class UserServlet extends BaseServelet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		request.setAttribute("loggedUser", request.getSession().getAttribute("loggedUser"));
+		User loggedUser = (User) request.getSession().getAttribute("loggedUser");
+		request.setAttribute("loggedUser", loggedUser);
 		User user;
-		UserDAO dao = new UserDAO(this.getDBSettings());
+		UserDAO userDAO = new UserDAO(this.getDBSettings());
+
+		String unfollow = request.getParameter("unfollow");
+		if (loggedUser != null && unfollow != null) {
+			int unfollowId = Integer.parseInt(unfollow);
+			userDAO.deleteRelation(loggedUser, userDAO.getUser(unfollowId));
+			response.sendRedirect("user?id=" + unfollowId);
+			return;
+		}
+
+		String follow = request.getParameter("follow");
+		if (loggedUser != null && follow != null) {
+			int followId = Integer.parseInt(follow);
+			userDAO.addRelation(loggedUser, userDAO.getUser(followId));
+			response.sendRedirect("user?id=" + followId);
+			return;
+		}
 
 		String uid = request.getParameter("id");
 		if (uid == null) {
-			request.setAttribute("users", dao.getAllUsers());
+			request.setAttribute("users", userDAO.getAllUsers());
 			request.getRequestDispatcher("WEB-INF/jsp/allUsers.jsp").forward(request, response);
 			return;
 		}
 
 		try {
 			int userId = Integer.parseInt(uid);
-			user = dao.getUser(userId);
+			user = userDAO.getUser(userId);
 
 		} catch (NumberFormatException ex) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid user id");
 			return;
 		}
 
+
+		boolean friends = userDAO.areUsersInRelation(loggedUser, user);
+
+		request.setAttribute("friends", friends);
 		request.setAttribute("user", user);
-		request.setAttribute("followers", dao.getFollowersOfUser(user));
-		request.setAttribute("followings", dao.getUserFollowings(user));
+		request.setAttribute("followers", userDAO.getFollowersOfUser(user));
+		request.setAttribute("followings", userDAO.getUserFollowings(user));
 		TweetDAO tweetDAO = new TweetDAO(this.getDBSettings());
 		int page = 1;
 		try {
@@ -66,7 +87,7 @@ public class UserServlet extends BaseServelet {
 		} catch (NumberFormatException ex) {
 		}
 
-		int offset = UserServlet.TWEETS_PER_PAGE * Math.abs(page-1);
+		int offset = UserServlet.TWEETS_PER_PAGE * Math.abs(page - 1);
 		TweetResult tweets = tweetDAO.getTweetsFromUser(user, offset, UserServlet.TWEETS_PER_PAGE);
 		request.setAttribute("userTweets", tweets);
 		Pager p = new Pager(page, tweets.getTotalCount(), UserServlet.TWEETS_PER_PAGE);
@@ -86,6 +107,6 @@ public class UserServlet extends BaseServelet {
 	 */
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {		
+			throws ServletException, IOException {
 	}
 }

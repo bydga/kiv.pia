@@ -61,7 +61,7 @@
 
 					<table>
 						<tr><td class="label">Login/nickname: </td><td class="field"><input type="text" id="login" name="login" value="${userFilled.login}"><span class="required-mark">*</span></td></tr>
-						<tr><td class="label">Your image: </td><td class="field"><input id="image" type="file" name="image"><input type="text" disabled="disabled" name="image-path" id="image-path"><input value="Browse..." type="button" name="image-trigger" id="image-trigger"><div class="cleaner"></div></td></tr>
+						<!--<tr><td class="label">Your image: </td><td class="field"><input id="image" type="file" name="image"><input type="text" disabled="disabled" name="image-path" id="image-path"><input value="Browse..." type="button" name="image-trigger" id="image-trigger"><div class="cleaner"></div></td></tr>-->
 						<tr><td class="label">Password: </td><td class="field"><input id="password" type="password" name="password"><span class="required-mark">*</span></td></tr>
 						<tr><td class="label">Password again: </td><td class="field"><input id="password2" type="password" name="password2"><span class="required-mark">*</span></td></tr>
 						<tr><td class="label">Your name: </td><td class="field"><input type="text" name="name" value="${userFilled.name}"></td></tr>

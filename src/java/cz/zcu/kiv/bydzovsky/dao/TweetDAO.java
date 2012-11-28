@@ -26,9 +26,9 @@ import java.util.logging.Logger;
  * @author bydga
  */
 public class TweetDAO {
-	
+
 	private final DBSettings dbSettings;
-	
+
 	public TweetDAO(DBSettings dbSettings) {
 		this.dbSettings = dbSettings;
 		try {
@@ -37,10 +37,10 @@ public class TweetDAO {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-	
+
 	public TweetResult getUserStream(User u, int offset, int limit) {
 		TweetResult tweets = new TweetResult();
-		
+
 		try {
 			Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
 			PreparedStatement preparedStatement = connection.prepareStatement(""
@@ -56,8 +56,8 @@ public class TweetDAO {
 		} catch (SQLException ex) {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		
-		
+
+
 		try {
 			Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
 			PreparedStatement preparedStatement = connection.prepareStatement(""
@@ -84,10 +84,10 @@ public class TweetDAO {
 		} catch (SQLException ex) {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		
+
 		return tweets;
 	}
-	
+
 	public TweetResult getTweetsFromUser(User u, int offset, int limit) {
 		TweetResult tweets = new TweetResult();
 		try {
@@ -105,7 +105,7 @@ public class TweetDAO {
 		} catch (SQLException ex) {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		
+
 		try {
 			Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
 			PreparedStatement preparedStatement = connection.prepareStatement(""
@@ -131,15 +131,15 @@ public class TweetDAO {
 		} catch (SQLException ex) {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		
+
 		return tweets;
 	}
-	
+
 	public Tweet insertTweet(Tweet t) {
-		
+
 		try {
 			Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
-			
+
 			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO bydga_tweet( published, user_id, text, retweet_id )"
 					+ "VALUES (?,?,?,?)", ResultSet.FETCH_UNKNOWN, Statement.RETURN_GENERATED_KEYS);
 			preparedStatement.setTimestamp(1, new java.sql.Timestamp(t.getPublished().getTime()));
@@ -162,18 +162,22 @@ public class TweetDAO {
 			}
 		} catch (SQLException ex) {
 		}
-		
+
 		return t;
 	}
-	
+
 	private Tweet fillTweetFromDB(ResultSet resultSet, String prefix) {
 		Tweet tweet = new Tweet();
 		try {
 			tweet.setTweetId(resultSet.getInt(prefix + "tweet_id"));
 			tweet.setPublished(resultSet.getTimestamp(prefix + "published"));
 			tweet.setText(resultSet.getString(prefix + "text").replaceAll("(\r\n|\r|\n)", "<br />"));
-			tweet.setRwetweetCount(resultSet.getInt(prefix + "retweet_count"));
-			
+			try {
+				tweet.setRwetweetCount(resultSet.getInt(prefix + "retweet_count"));
+			} catch (SQLException ex) {
+				tweet.setRwetweetCount(0);
+			}
+
 			User u = new User();
 			u.setId(resultSet.getInt(prefix + "user_id"));
 			u.setLogin(resultSet.getString(prefix + "login"));
@@ -186,21 +190,44 @@ public class TweetDAO {
 			String image = resultSet.getString(prefix + "image") != null ? resultSet.getString(prefix + "image") : u.getSex().toString().toLowerCase() + ".jpg";
 			u.setImage(image);
 			tweet.setAuthor(u);
-			
+
 			if (resultSet.getInt(prefix + "retweet_id") > 0) {
 				Tweet retweetedFrom = this.fillTweetFromDB(resultSet, "orig_");
 				tweet.setRetweetedFrom(retweetedFrom);
 				tweet.setRwetweetCount(retweetedFrom.getRetweetCount());
-				
+
 			} else {
 				tweet.setRetweetedFrom(null);
 			}
-			
+
 		} catch (Exception ex) {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 			return null;
 		}
-		
+
 		return tweet;
+	}
+
+	public Tweet getTweetById(int tweetId) {
+		try {
+			Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
+			PreparedStatement preparedStatement = connection.prepareStatement(""
+					+ "SELECT t.*, u.*, rt.tweet_id AS orig_tweet_id, "
+					+ "rt.published AS orig_published, rt.user_id AS orig_user_id, rt.text AS orig_text, rt.retweet_id AS orig_retweet_id, "
+					+ "ru.login AS orig_login, ru.password AS orig_password, ru.name AS orig_name, ru.surname AS orig_surname, ru.sex AS orig_sex, ru.birthdate AS orig_birthdate, ru.bio AS orig_bio, ru.image AS orig_image "
+					+ "FROM bydga_tweet t "
+					+ "INNER JOIN bydga_user u ON u.user_id=t.user_id "
+					+ "LEFT JOIN bydga_tweet rt ON rt.tweet_id=t.retweet_id "
+					+ "LEFT JOIN bydga_user ru ON ru.user_id=rt.user_id "
+					+ "WHERE t.tweet_id=?");
+			preparedStatement.setInt(1, tweetId);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			if (resultSet.next()) {
+				return this.fillTweetFromDB(resultSet, "");
+			}
+		} catch (SQLException ex) {
+			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		return null;
 	}
 }

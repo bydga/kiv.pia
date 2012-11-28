@@ -43,12 +43,34 @@ public class StreamServlet extends BaseServelet {
 			return;
 		}
 		
+		TweetDAO tweetDAO = new TweetDAO(this.getDBSettings());
+		String retweet = request.getParameter("retweet");
+		if (retweet != null) {
+			try {
+				int tweetId = Integer.parseInt(retweet);
+				Tweet original = tweetDAO.getTweetById(tweetId);
+				Tweet newTweet = new Tweet();
+				newTweet.setAuthor(user);
+				newTweet.setPublished(new Date());
+				newTweet.setRetweetedFrom(original.getRetweetedFrom() != null ? original.getRetweetedFrom() : original);
+				newTweet.setText(original.getText());
+				tweetDAO.insertTweet(newTweet);
+				response.sendRedirect("stream");
+				return;
+				
+			}
+			catch (NumberFormatException ex)
+			{
+				response.sendRedirect("stream");
+				return;
+			}
+		}
+		
 		UserDAO dao = new UserDAO(this.getDBSettings());
 
 		request.setAttribute("user", user);
 		request.setAttribute("followers", dao.getFollowersOfUser(user));
 		request.setAttribute("followings", dao.getUserFollowings(user));
-		TweetDAO tweetDAO = new TweetDAO(this.getDBSettings());
 		int page = 1;
 		try {
 			page = Integer.parseInt(request.getParameter("page"));

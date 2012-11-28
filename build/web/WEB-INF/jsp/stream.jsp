@@ -48,7 +48,7 @@
 							<div class="tweet-text">${tweet.text}</div>
 						</div>
 						<div class="cleaner"></div>
-						<span class="tweet-bottom"><a class="tweet-date" href="#"><fmt:formatDate value="${tweet.published}" pattern="dd.MM.yyyy HH:mm" /></a> | ${tweet.retweetCount}x Retweeted | <a class="tweet-date" href="#">Retweet now</a></span>
+						<span class="tweet-bottom"><a class="tweet-date" href="#"><fmt:formatDate value="${tweet.published}" pattern="dd.MM.yyyy HH:mm" /></a> | ${tweet.retweetCount}x Retweeted | <a class="tweet-date" href="stream?retweet=${tweet.tweetId}">Retweet now</a></span>
 					</div>
 				</c:forEach>
 

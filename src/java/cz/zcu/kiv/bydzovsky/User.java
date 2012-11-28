@@ -51,7 +51,7 @@ public class User {
 		}
 		return null;
 	}
-
+	
 	public Date getBirthdate() {
 		return birthdate;
 	}

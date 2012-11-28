@@ -76,6 +76,27 @@ public class UserDAO {
 
 	}
 
+	public boolean areUsersInRelation(User u1, User u2) {
+		if (u1 == null || u2 == null) {
+			return false;
+		}
+		try {
+			Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
+			PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM bydga_friend WHERE user_id=? AND friend_id=?");
+			preparedStatement.setInt(1, u1.getId());
+			preparedStatement.setInt(2, u2.getId());
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			if (resultSet.next()) {
+				return true;
+			}
+
+		} catch (SQLException ex) {
+			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		return false;
+	}
+
 	public List<User> getAllUsers() {
 		List<User> out = new ArrayList<User>();
 		try {
@@ -97,7 +118,7 @@ public class UserDAO {
 	public User getUser(int userId) {
 		try {
 			Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
-			PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM bydga_user WHERE user_id=?;");
+			PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM bydga_user WHERE user_id=?");
 			preparedStatement.setInt(1, userId);
 			ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -156,7 +177,7 @@ public class UserDAO {
 				Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 			}
 
-			preparedStatement = connection.prepareStatement("SELECT * FROM bydga_user WHERE login=? AND password=?;");
+			preparedStatement = connection.prepareStatement("SELECT * FROM bydga_user WHERE login=? AND password=?");
 			preparedStatement.setString(1, login);
 			preparedStatement.setString(2, pass);
 			resultSet = preparedStatement.executeQuery();
@@ -188,5 +209,31 @@ public class UserDAO {
 		}
 
 		return user;
+	}
+
+	public void deleteRelation(User loggedUser, User user) {
+		try {
+			Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
+			PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM bydga_friend WHERE user_id=? AND friend_id=?");
+			preparedStatement.setInt(1, loggedUser.getId());
+			preparedStatement.setInt(2, user.getId());
+			int res = preparedStatement.executeUpdate();
+
+		} catch (SQLException ex) {
+			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
+	
+	public void addRelation(User loggedUser, User user) {
+		try {
+			Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
+			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO bydga_friend (user_id, friend_id) VALUES (?, ?)");
+			preparedStatement.setInt(1, loggedUser.getId());
+			preparedStatement.setInt(2, user.getId());
+			int res = preparedStatement.executeUpdate();
+
+		} catch (SQLException ex) {
+			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
 }
