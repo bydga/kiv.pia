@@ -1,0 +1,341 @@
+/* reset css */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+
+textarea,input[type="text"], input[type="password"]
+{
+	margin: 2px;
+	padding: 2px;
+	border-width: 1px;
+}
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+
+body {
+	line-height: 1.1;
+	font-family: "Arial";
+	background-color: #E7E7E9;
+}
+
+strong
+{
+	font-weight: bold;
+}
+h1,h2,h3,h4
+{
+	font-weight: bold;
+	margin-bottom: 8px;
+}
+
+h3
+{
+	font-size: 16px;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+a,a:visited
+{
+	text-decoration: none;
+	color: #666;
+}
+
+
+/* styles here */
+
+
+a.tweet-date
+{
+	text-decoration: underline;
+}
+
+.cleaner
+{
+	clear:both;
+}
+
+.top-bar
+{
+	background-color: black;
+	color: white;
+	padding: 10px;
+}
+
+.top-bar-content
+{
+	margin:auto;
+    width: 912px
+}
+
+.top-bar a
+{
+	color: white;
+}
+
+.rounded-box
+{
+	border: 1px solid black;
+	padding: 10px;
+	border-radius: 10px;
+	margin: 10px 0 10px 0;
+}
+
+.tweet:hover
+{
+	background-color: #F0F0FF;
+}
+
+.tweet-author
+{
+	margin-bottom: 5px;
+}
+a.profile-link
+{
+	font-size: 12px;
+}
+
+.tweet-bottom a, .tweet-bottom
+{
+	color: #AAA;
+	font-size: 12px;
+}
+
+.tweet-content
+{
+	float:left;
+}
+
+
+.wrapper
+{
+	border: 1px solid black;
+	background-color: white;
+	border-radius: 10px;
+	width: 900px;
+	margin: 0 auto 200px auto;
+	padding: 10px;
+	box-shadow: 0px 10px 10px 5px #888;
+
+
+}
+
+
+.tweet-list
+{
+	width: 480px;
+	float: left;
+}
+
+.author-icon
+{
+	float:left;
+	padding: 5px;
+}
+
+.right-menu
+{
+	width: 378px;
+	float:right;
+}
+
+.profile-card-zebra1
+{
+	background-color: #97BE1A;
+}
+
+.profile-card-zebra2
+{
+	background-color: #F0F0FF;
+}
+
+.profile-info-upper
+{
+	background-color: #97BE1A;
+	border-radius: 10px 10px 0 0;
+	padding: 10px;
+	border-top: 1px solid black;
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+
+}
+
+.profile-info-lower
+{
+	background-color: #F0F0FF;
+	border-radius: 0 0 10px 10px;
+	padding: 10px;
+	border: 1px solid black;
+}
+
+.profile-info-lower .left-cell
+{
+	width: 160px;
+}
+
+
+.new-tweet
+{
+	margin-bottom: 10px;
+	background-color: #F0F0FF;
+}
+
+.logo
+{
+	background: transparent url(complete.png) no-repeat;
+	width: 387px;
+	height: 145px;
+	margin: auto;
+}
+
+#new-tweet-textarea
+{
+	resize: none;
+	height: 15px;
+	width: 350px;
+	color:grey;
+	overflow: hidden;
+}
+
+#new-tweet-button
+{
+	display: none;
+	float: right;
+}
+
+.user-image
+{
+	float: left;
+	width: 60px;
+}
+
+.user-name 
+{
+	float: left;
+}
+
+
+#page-login-register
+{
+  margin-top: 10px;	
+}
+
+.register-form
+{
+	width: 500px;
+	margin: auto;
+}
+
+.login-form
+{
+	background-color: #F0F0FF;
+	width: 500px;
+	margin: 0 auto 10px auto;
+}
+
+#page-login-register .label
+{
+	height: 25px;
+	width: 130px;
+	vertical-align: middle;
+}
+
+#page-login-register textarea
+{
+	resize: none;
+	width: 200px;
+}
+
+#page-login-register input[type="text"],#page-login-register input[type="password"]
+{
+	width: 200px;
+}
+
+.required-mark
+{
+	color: red;
+/*	vertical-align: super;*/
+}
+
+
+.pager
+{
+	text-align: center;	
+}
+
+.pager a
+{
+	color: black;
+	margin: 2px;
+	text-decoration: underline;
+}
+
+.friend-list
+{
+	margin-top: 10px;
+}
+
+#register-form #image-path, #register-form #image-trigger
+{
+	display: none;
+}
+
+#page-login-register #image-path
+{
+	width: 123px;
+}
+
+.field
+{
+}
+
+
+.validation-error
+{
+	color: red;
+	border: 2px solid red;
+}
+
+#validation-errors, #server-errors
+{
+	color: red;
+	
+}
+
+.users-list
+{
+	width: 480px;
+}
