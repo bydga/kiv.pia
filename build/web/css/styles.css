@@ -339,3 +339,14 @@ a.profile-link
 {
 	width: 480px;
 }
+
+.follow-link
+{
+	color: black;
+}
+
+.retweeted-by
+{
+	color: black;
+	font-size: 10px;
+}

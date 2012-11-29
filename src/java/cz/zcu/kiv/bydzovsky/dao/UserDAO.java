@@ -26,9 +26,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UserDAO {
-
+	
 	private final DBSettings dbSettings;
-
+	
 	public UserDAO(DBSettings dbSettings) {
 		this.dbSettings = dbSettings;
 		try {
@@ -37,10 +37,10 @@ public class UserDAO {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-
+	
 	public User insertUser(User u) throws SQLException {
-
-
+		
+		
 		try {
 			byte[] bytes = MessageDigest.getInstance("MD5").digest(u.getPassword().getBytes("UTF-8"));
 			String pass = String.format("%0" + (bytes.length << 1) + "X", new BigInteger(1, bytes));
@@ -48,10 +48,10 @@ public class UserDAO {
 		} catch (Exception ex) {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 		}
-
+		
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
-
+		
 		PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO bydga_user( login, password, name, surname, sex, birthdate, bio )"
 				+ "VALUES (?,?,?,?,?,?,?)", ResultSet.FETCH_UNKNOWN, Statement.RETURN_GENERATED_KEYS);
 		preparedStatement.setString(1, u.getLogin());
@@ -71,11 +71,13 @@ public class UserDAO {
 		} else {
 			throw new SQLException("Cannot insert user");
 		}
-
+		
+		String image = u.getSex().toString().toLowerCase() + ".jpg";
+		u.setImage(image);
 		return u;
-
+		
 	}
-
+	
 	public boolean areUsersInRelation(User u1, User u2) {
 		if (u1 == null || u2 == null) {
 			return false;
@@ -86,58 +88,58 @@ public class UserDAO {
 			preparedStatement.setInt(1, u1.getId());
 			preparedStatement.setInt(2, u2.getId());
 			ResultSet resultSet = preparedStatement.executeQuery();
-
+			
 			if (resultSet.next()) {
 				return true;
 			}
-
+			
 		} catch (SQLException ex) {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		return false;
 	}
-
+	
 	public List<User> getAllUsers() {
 		List<User> out = new ArrayList<User>();
 		try {
 			Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
 			PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM bydga_user ORDER BY login");
 			ResultSet resultSet = preparedStatement.executeQuery();
-
+			
 			while (resultSet.next()) {
 				out.add(this.fillUserFromDB(resultSet));
 			}
-
+			
 		} catch (SQLException ex) {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 		}
-
+		
 		return out;
 	}
-
+	
 	public User getUser(int userId) {
 		try {
 			Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
 			PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM bydga_user WHERE user_id=?");
 			preparedStatement.setInt(1, userId);
 			ResultSet resultSet = preparedStatement.executeQuery();
-
+			
 			return resultSet.next() ? this.fillUserFromDB(resultSet) : null;
-
+			
 		} catch (SQLException ex) {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 			return null;
 		}
 	}
-
+	
 	public List<User> getUserFollowings(User u) {
 		return this.getUserConnections(u, "friend_id", "user_id");
 	}
-
+	
 	public List<User> getFollowersOfUser(User u) {
 		return this.getUserConnections(u, "user_id", "friend_id");
 	}
-
+	
 	private List<User> getUserConnections(User u, String joinColumn, String whereColumn) {
 		List<User> output = new ArrayList<User>();
 		try {
@@ -146,28 +148,28 @@ public class UserDAO {
 					"SELECT u.* FROM bydga_friend f INNER JOIN bydga_user u ON u.user_id=f." + joinColumn + " WHERE f." + whereColumn + "=?");
 			preparedStatement.setInt(1, u.getId());
 			ResultSet resultSet = preparedStatement.executeQuery();
-
+			
 			while (resultSet.next()) {
 				output.add(this.fillUserFromDB(resultSet));
 			}
-
+			
 		} catch (SQLException ex) {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 			return null;
 		}
-
+		
 		return output;
 	}
-
+	
 	public User authenticateUser(String login, String pass) {
-
+		
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
-
+		
 		try {
 			connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
-
+			
 			try {
 				byte[] bytes = MessageDigest.getInstance("MD5").digest(pass.getBytes("UTF-8"));
 				pass = String.format("%0" + (bytes.length << 1) + "x", new BigInteger(1, bytes));
@@ -176,20 +178,20 @@ public class UserDAO {
 			} catch (UnsupportedEncodingException ex) {
 				Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 			}
-
+			
 			preparedStatement = connection.prepareStatement("SELECT * FROM bydga_user WHERE login=? AND password=?");
 			preparedStatement.setString(1, login);
 			preparedStatement.setString(2, pass);
 			resultSet = preparedStatement.executeQuery();
-
+			
 			return resultSet.next() ? this.fillUserFromDB(resultSet) : null;
-
+			
 		} catch (SQLException e) {
 			return null;
 		}
-
+		
 	}
-
+	
 	private User fillUserFromDB(ResultSet resultSet) {
 		User user = new User();
 		try {
@@ -207,10 +209,10 @@ public class UserDAO {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 			return null;
 		}
-
+		
 		return user;
 	}
-
+	
 	public void deleteRelation(User loggedUser, User user) {
 		try {
 			Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
@@ -218,7 +220,7 @@ public class UserDAO {
 			preparedStatement.setInt(1, loggedUser.getId());
 			preparedStatement.setInt(2, user.getId());
 			int res = preparedStatement.executeUpdate();
-
+			
 		} catch (SQLException ex) {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -231,7 +233,24 @@ public class UserDAO {
 			preparedStatement.setInt(1, loggedUser.getId());
 			preparedStatement.setInt(2, user.getId());
 			int res = preparedStatement.executeUpdate();
-
+			
+		} catch (SQLException ex) {
+			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
+	
+	public void updateUserImage(User u) {
+		try {			
+			Connection connection = DriverManager.getConnection(this.dbSettings.getConnectionUrl(), this.dbSettings.getUser(), this.dbSettings.getPassword());
+			
+			PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bydga_user SET image=? WHERE user_id=?");
+			preparedStatement.setString(1, u.getImage());
+			preparedStatement.setInt(2, u.getId());
+			int res = preparedStatement.executeUpdate();
+			if (res == 0) {
+				throw new SQLException("Cannot insert user");
+			}
+			
 		} catch (SQLException ex) {
 			Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
 		}

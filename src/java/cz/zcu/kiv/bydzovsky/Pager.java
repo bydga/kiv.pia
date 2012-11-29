@@ -20,7 +20,7 @@ public class Pager extends ArrayList<PagerItem> {
 		PagerItem prev = new PagerItem("&lsaquo; Previous", curentPage - 1, curentPage > 1);
 		this.add(first);
 		this.add(prev);
-		int pages = (int) Math.ceil(totalRecords / perPage);
+		int pages = (int) Math.ceil((float)totalRecords / perPage);
 		for (int i = 1; i <= pages; i++) {
 			PagerItem item = new PagerItem("" + i, i, curentPage != i);
 			this.add(item);

@@ -10,11 +10,27 @@ import cz.zcu.kiv.bydzovsky.TweetResult;
 import cz.zcu.kiv.bydzovsky.dao.TweetDAO;
 import cz.zcu.kiv.bydzovsky.User;
 import cz.zcu.kiv.bydzovsky.dao.UserDAO;
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 /**
  *
@@ -42,7 +58,7 @@ public class StreamServlet extends BaseServelet {
 			response.sendRedirect("login");
 			return;
 		}
-		
+
 		TweetDAO tweetDAO = new TweetDAO(this.getDBSettings());
 		String retweet = request.getParameter("retweet");
 		if (retweet != null) {
@@ -57,15 +73,13 @@ public class StreamServlet extends BaseServelet {
 				tweetDAO.insertTweet(newTweet);
 				response.sendRedirect("stream");
 				return;
-				
-			}
-			catch (NumberFormatException ex)
-			{
+
+			} catch (NumberFormatException ex) {
 				response.sendRedirect("stream");
 				return;
 			}
 		}
-		
+
 		UserDAO dao = new UserDAO(this.getDBSettings());
 
 		request.setAttribute("user", user);
@@ -100,20 +114,55 @@ public class StreamServlet extends BaseServelet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		request.setCharacterEncoding("UTF-8");
+
+
 		User user = (User) request.getSession().getAttribute("loggedUser");
 		if (user != null) {
 
-			Tweet t = new Tweet();
-			t.setAuthor(user);
-			t.setText(request.getParameter("new-tweet-textarea"));
-			t.setPublished(new Date());
-			TweetDAO dao = new TweetDAO(this.getDBSettings());
-			dao.insertTweet(t);
+			String tweetText = request.getParameter("new-tweet-textarea");
+			if (tweetText != null) {
+				//new tweet
+				request.setCharacterEncoding("UTF-8");
+				Tweet t = new Tweet();
+				t.setAuthor(user);
+				t.setText(tweetText);
+				t.setPublished(new Date());
+				TweetDAO dao = new TweetDAO(this.getDBSettings());
+				dao.insertTweet(t);
+			} else {
+				try {
+					Random r = new Random();
+					FileItemFactory factory = new DiskFileItemFactory();
+					ServletFileUpload upload = new ServletFileUpload(factory);
+					List<FileItem> items = upload.parseRequest(request);
+					if (items.size() == 1) {
+						FileItem item = items.get(0);
+						BufferedImage img = ImageIO.read(item.getInputStream());
+						String fileName = user.getId() + "-" + r.nextInt(100) + ".png";
+						String fullPath = getServletContext().getRealPath("/") + "user-images" + File.separator + fileName;
+						BufferedImage resized = this.createResizedCopy(img, 50, 50);
+						boolean res = ImageIO.write(resized, "png", new File(fullPath));
+						if (res) {
+							UserDAO dao = new UserDAO(this.getDBSettings());
+							user.setImage(fileName);
+							dao.updateUserImage(user);
+						}
+					}
+
+				} catch (FileUploadException ex) {
+					Logger.getLogger(StreamServlet.class.getName()).log(Level.SEVERE, null, ex);
+				}
+			}
+			response.sendRedirect("stream");
 		}
+	}
 
-
-		response.sendRedirect("stream");
-
+	private BufferedImage createResizedCopy(Image originalImage, int scaledWidth, int scaledHeight) {
+		BufferedImage scaledBI = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = scaledBI.createGraphics();
+		g.setComposite(AlphaComposite.Src);
+		g.drawImage(originalImage, 0, 0, scaledWidth, scaledHeight, null);
+		g.dispose();
+		return scaledBI;
 	}
 }

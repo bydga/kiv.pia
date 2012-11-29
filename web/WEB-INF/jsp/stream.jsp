@@ -28,6 +28,7 @@
 
 			<div class="tweet-list">
 				<h1>Recent tweets</h1>
+				<c:if test="${fn:length(tweets) eq 0}">No tweets to display</c:if>
 				<c:forEach items="${tweets}" var="tweet">
 					<div class="tweet rounded-box">
 						<div class="author-icon">
@@ -37,10 +38,12 @@
 							<div class="tweet-author">
 								<c:choose>
 									<c:when test="${tweet.retweetedFrom ne null}">
+										<c:if test="${!empty tweet.retweetedFrom.author.name or !empty tweet.retweetedFrom.author.surname}"><a href="#">${tweet.retweetedFrom.author.name} ${tweet.retweetedFrom.author.surname}</a></c:if>
 										<a class="profile-link" href="user?id=${tweet.retweetedFrom.author.id}">@${tweet.retweetedFrom.author.login}</a>
-										(retweeted by <a class="profile-link" href="user?id=${tweet.author.id}">@${tweet.author.login}</a>)
+										<br><span class="retweeted-by">(retweeted by <a class="profile-link" href="user?id=${tweet.author.id}">@${tweet.author.login}</a>)</span>
 									</c:when>
 									<c:when test="${tweet.retweetedFrom eq null}">
+										<c:if test="${!empty tweet.author.name or !empty tweet.author.surname}"><a href="#">${tweet.author.name} ${tweet.author.surname}</a></c:if>
 										<a class="profile-link" href="user?id=${tweet.author.id}">@${tweet.author.login}</a>
 									</c:when>
 								</c:choose>
@@ -52,12 +55,14 @@
 					</div>
 				</c:forEach>
 
-				<div class="pager">
-					<c:forEach items="${tweetsPager}" var="item">
-						<c:if test="${item.active}"><span><a href="stream?page=${item.number}">${item.text}</a></span></c:if>
-						<c:if test="${!item.active}"><span class="pager-curent">${item.text}</a></span></c:if>
-					</c:forEach>
-				</div>
+				<c:if test="${fn:length(tweets) gt 0}">
+					<div class="pager">
+						<c:forEach items="${tweetsPager}" var="item">
+							<c:if test="${item.active}"><span><a href="stream?page=${item.number}">${item.text}</a></span></c:if>
+							<c:if test="${!item.active}"><span class="pager-curent">${item.text}</a></span></c:if>
+						</c:forEach>
+					</div>
+				</c:if>
 
 			</div>
 
@@ -77,8 +82,15 @@
 
 				<div class="profile-info-upper">
 					<div class="user-image"><img src="user-images/${user.image}" alt="picture"></div>
-					<div class="user-name">${user.name} ${user.surname}<br><a class="profile-link" href="user?id=${user.id}">@${user.login}</a><br><a class="profile-link" href="user?id=${user.id}">View profile</a></div>
+					<div class="user-name">${user.name} ${user.surname}<br>
+						<a class="profile-link" id="upload-image-link" href="#"> (Upload new profile image)</a><br>
+						<a class="profile-link" href="user?id=${user.id}">@${user.login}</a><br>
+						<a class="profile-link" href="user?id=${user.id}">View profile</a>
+					</div>
 
+					<form id="upload-image" method="post" enctype="multipart/form-data">
+						<input type="file" name="user-image" id="user-image">
+					</form>
 					<div class="cleaner"></div>
 				</div>
 				<div class="profile-info-lower">

@@ -34,6 +34,7 @@
 			<div class="tweet-list">
 				<h1>${user.login} latest tweets</h1>
 
+				<c:if test="${fn:length(tweets) eq 0}">No tweets to display</c:if>
 				<c:forEach  items="${userTweets}" var="tweet">
 					<div class="tweet rounded-box">
 						<div class="author-icon">
@@ -60,15 +61,16 @@
 				</c:forEach>
 
 
-
-				<div class="pager">
+				<c:if test="${fn:length(tweets)gt 0}">
 					<div class="pager">
-						<c:forEach items="${tweetsPager}" var="item">
-							<c:if test="${item.active}"><span><a href="user?id=${user.id}&page=${item.number}">${item.text}</a></span></c:if>
-							<c:if test="${!item.active}"><span class="pager-curent">${item.text}</a></span></c:if>
-						</c:forEach>
+						<div class="pager">
+							<c:forEach items="${tweetsPager}" var="item">
+								<c:if test="${item.active}"><span><a href="user?id=${user.id}&page=${item.number}">${item.text}</a></span></c:if>
+								<c:if test="${!item.active}"><span class="pager-curent">${item.text}</a></span></c:if>
+							</c:forEach>
+						</div>
 					</div>
-				</div>
+				</c:if>
 			</div>
 			<div class="right-menu">
 
@@ -77,21 +79,21 @@
 					<div class="user-name">
 						${user.name} ${user.surname}<br><a class="profile-link" href="user?id=${user.id}">@${user.login}</a>
 						<c:if test="${loggedUser ne null and friends}">
-							<a href="user?unfollow=${user.id}">Unfollow</a>
+							- <a class="follow-link" href="user?unfollow=${user.id}">Unfollow</a>
 						</c:if>
 						<c:if test="${loggedUser ne null and !friends and loggedUser.id ne user.id}">
-							<a href="user?follow=${user.id}">Follow</a>
+							- <a class="follow-link" href="user?follow=${user.id}">Follow</a>
 						</c:if>
 					</div>
 					<div class="cleaner"></div>
 				</div>
 				<div class="profile-info-lower">
 					<div>${user.sex}<c:if test="${user.age ne null}">, ${user.age} years</c:if></div>
-					<div><strong>Bio:</strong> ${user.bio}</div>
-				</div>
+					<c:if test="${fn:length(user.bio) gt 0}"><div><strong>Bio:</strong> ${user.bio}</div></c:if>
+					</div>
 
-				<div class="friend-list">
-					<h3>${fn:length(followers)} Followers</h3>
+					<div class="friend-list">
+						<h3>${fn:length(followers)} Followers</h3>
 
 					<c:forEach items="${followers}" var="follower">
 						<div class="profile-card-zebra2 rounded-box">

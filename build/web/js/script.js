@@ -76,15 +76,14 @@ $(document).ready(function(){
 	
 	});
 	
-	$('#image').hide();
-	$('#image-trigger').show();
-	$('#image-path').show();
-	$('#image-trigger').click(function() {
-		$('#image').click();
+	$('#upload-image').hide();
+	$('#upload-image-link').click(function() {
+		$('#user-image').click();
 	});
 	
-	$('#image').change(function() {
-		$('#image-path').val($('#image').val().replace("C:\\fakepath\\", ""));
+	$('#user-image').change(function() {
+		$('#upload-image').submit();
 	});
+	
 
 });

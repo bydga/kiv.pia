@@ -1,3 +1,5 @@
+SET foreign_key_checks = 0;
+
 DROP TABLE IF EXISTS bydga_friend;
 DROP TABLE IF EXISTS bydga_tweet;
 DROP TABLE IF EXISTS bydga_user;
@@ -37,16 +39,12 @@ ALTER TABLE bydga_friend ADD FOREIGN KEY (friend_id) REFERENCES bydga_user(user_
 ALTER TABLE bydga_friend ADD UNIQUE KEY (user_id, friend_id);
 
 
-SET foreign_key_checks = 0;
 
 INSERT INTO bydga_user (`login`, `password`, `name`, `surname`, `sex`, `birthdate`, `bio`, `image`) VALUES
-	("bydga", MD5("bydga"), "Martin", "Bydžovský", "Male", "1988-08-09", "bydga descr", "1.jpg"),
-	("user1", MD5("user1"), "USER1", null, "Male", null, null, null),
-	("user2", MD5("user2"), null, null, "Male", null, null, null),
-	("user3", MD5("user3"), "USER3", null, "Male", null, null, null),
-	("user4", MD5("user4"), "USER4", null, "Male", null, null, null),
-	("user5", MD5("user5"), "USER5", null, "Male", null, null, null),
-	("user6", MD5("user6"), "USER6", null, "Male", null, null, null);
+	("user1", MD5("User@1234"), "Martin", "Bydžovský", "Male", "1988-08-09", "bydga descr", "1-49.png"),
+	("user2", MD5("User@1234"), "USER1", "Prijmeni", "Male", null, null, "2-72.png"),
+	("user3", MD5("User@1234"), null, null, "Male", null, null, "3-68.png"),
+	("user4", MD5("User@1234"), "USER3", null, "Male", null, null, null);
 
 INSERT INTO bydga_tweet(`published`, `user_id`,`text`, `retweet_id`) VALUES
 	("2012-11-01 20:00", 1, "tweet1", null),
@@ -70,16 +68,23 @@ INSERT INTO bydga_tweet(`published`, `user_id`,`text`, `retweet_id`) VALUES
 	("2012-11-01 20:00", 1, "tweet19", null),
 	("2012-11-02 21:00", 2, "tweet1", 1),
 	("2012-11-02 21:00", 1, "tweet20", null),
-	("2012-11-02 21:00", 7, "tweet21", null);
+  ("2012-11-02 21:00", 2, "tweet22", null),
+  ("2012-11-02 21:00", 2, "tweet23", null),
+  ("2012-11-02 21:00", 2, "tweet24", null),
+  ("2012-11-02 21:00", 2, "tweet25", null),
+  ("2012-11-02 21:00", 2, "tweet26", null),
+  ("2012-11-02 21:00", 2, "tweet27", null),
+  ("2012-11-02 21:00", 2, "tweet28", null),
+  ("2012-11-02 21:00", 2, "tweet29", null),
+  ("2012-11-02 21:00", 2, "tweet30", null),
+  ("2012-11-02 21:00", 2, "tweet31", null),
+  ("2012-11-02 21:00", 2, "tweet32", null);
 
 INSERT INTO bydga_friend(`user_id`, `friend_id`) VALUES
 	(1,2),
 	(1,3),
 	(1,4),
-	(1,5),
-	(1,6),
 	(2,3),
 	(2,1),
-	(5,1),
 	(3,4);
 SET foreign_key_checks = 1;
